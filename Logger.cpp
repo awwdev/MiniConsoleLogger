@@ -78,7 +78,6 @@ namespace mini::logger
 
         size_t fmtPos1 = 0;
         size_t parPos1 = 0;
-
         size_t fmtPos2 = fmt.find("{}");
         size_t parPos2 = par.find(",");
 
@@ -89,7 +88,7 @@ namespace mini::logger
             return;
         }
 
-        do
+        while (fmtPos2 != std::string_view::npos && parPos2 != std::string_view::npos)
         {
             std::cout << fmt.substr(fmtPos1, fmtPos2 - fmtPos1);
             std::cout << par.substr(parPos1, parPos2 - parPos1);
@@ -100,9 +99,7 @@ namespace mini::logger
             fmtPos2 = fmt.find("{}", fmtPos2 + 1);
             parPos2 = par.find(",",  parPos2 + 1);
         }
-        while (fmtPos2 != std::string_view::npos && parPos2 != std::string_view::npos);
         std::cout << fmt.substr(fmtPos1, fmt.length() - fmtPos1);
-        
         std::cout << std::endl;
     }
 }
