@@ -6,5 +6,7 @@ Using C++17.
 ![alt text](https://github.com/awwdev/MiniConsoleLogger/blob/master/MiniLoggerImg.png)
 
 LOG_INFO("This is foo: {} and this is bar {}, sir.", 42, "baz")
+
 LOG_WARN("{}{}{}", "warning")
+
 LOG_ERR("unexpected error")
