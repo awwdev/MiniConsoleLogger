@@ -51,16 +51,16 @@ namespace mini::logger
     template<typename ...Args>
     auto paramsToStr(Args... args) -> std::string
     {
-        size_t constexpr size = sizeof...(Args);
-        if constexpr (size == 0) return "";
-
-        std::stringstream sstream;
-        int expanderTrick[size == 0 ? 1 : size] = {
-            ((sstream << args << ","), 0) ...
-            //most right of comma expression will be assigned to tmp array
-            //but everything will be evaluated, so the sstream gets filled 
-        };
-        return sstream.str();
+        if constexpr (sizeof...(Args) > 0) {
+            std::stringstream sstream;
+            int expanderTrick[sizeof...(Args)] = {
+                ((sstream << args << ","), 0) ...
+                //most right of comma expression will be assigned to tmp array
+                //but everything will be evaluated, so the sstream gets filled 
+            };
+            return sstream.str();
+        }
+        return "";
     }
 
     void log(const SourceFile src, const Level lvl, std::string_view fmt, std::string_view parameters);
