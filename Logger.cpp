@@ -8,6 +8,7 @@
 #endif
 
 #include <time.h>
+#include <iomanip>
 
 namespace mini::logger
 {
@@ -23,37 +24,33 @@ namespace mini::logger
     #endif
     }
 
-    inline void printThreadName(const size_t fixedSize = 7u)
+    inline void printThreadName()
     {
         setColor(g_consoleColorWindows);
-        auto str = g_threadName;
-        str.resize(fixedSize);
-        std::cout << str << " ";
+        std::cout << std::setw(7) << g_threadName.substr(0, 7) << " ";
     }
 
-    inline void printTime(const size_t fixedSize = 9u)
+    inline void printTime()
     {
         time_t rawtime;
         struct tm timeinfo;
         time(&rawtime);
         localtime_s(&timeinfo, &rawtime);
-        std::string str = 
-            //std::to_string(timeinfo.tm_mday) + "/" + 
-            //std::to_string(timeinfo.tm_mon   + 1) + "/" +
-            //std::to_string(timeinfo.tm_year  + 1900) + " " +
-            std::to_string(timeinfo.tm_hour) + ":" +
-            std::to_string(timeinfo.tm_min)  + ":" + 
-            std::to_string(timeinfo.tm_sec);
-        str.resize(fixedSize);
-        std::cout << str;
+        std::cout 
+            << std::right
+            << std::setw(2) << timeinfo.tm_hour << ":"
+            << std::setw(2) << timeinfo.tm_min  << ":"
+            << std::setw(2) << timeinfo.tm_sec  << " "
+            << std::left;
     }
 
     inline void printSource(const SourceFile& src)
     {
-        std::string str = "[" + src.getName(12u) + ":" + src.getLine(4u);
-        str.resize(18u);
-        str += "] ";
-        std::cout << str;
+        std::cout 
+            << std::setw(12) << src.getName().substr(0, 12)
+            << ":" 
+            << std::right << std::setw(4) << src.line
+            << "] " << std::left;
     }
 
     inline void printLevel(const Level lvl)
@@ -71,6 +68,7 @@ namespace mini::logger
     {
         std::lock_guard<std::mutex> lock(g_logMutex);
 
+        std::cout << std::left;
         printThreadName();
         printTime();
         printSource(src);
@@ -79,7 +77,7 @@ namespace mini::logger
         size_t fmtPos1 = 0;
         size_t parPos1 = 0;
         size_t fmtPos2 = fmt.find("{}");
-        size_t parPos2 = par.find(",");
+        size_t parPos2 = par.find(PARAMS_DELIMITER);
 
         //nothing to formate
         if (fmtPos2 == std::string_view::npos || parPos2 == std::string_view::npos)
@@ -94,10 +92,10 @@ namespace mini::logger
             std::cout << par.substr(parPos1, parPos2 - parPos1);
 
             fmtPos1 = fmtPos2 + 2;
-            parPos1 = parPos2 + 1;
+            parPos1 = parPos2 + 2;
 
             fmtPos2 = fmt.find("{}", fmtPos2 + 1);
-            parPos2 = par.find(",",  parPos2 + 1);
+            parPos2 = par.find(PARAMS_DELIMITER, parPos2 + 1);
         }
         std::cout << fmt.substr(fmtPos1, fmt.length() - fmtPos1);
         std::cout << std::endl;

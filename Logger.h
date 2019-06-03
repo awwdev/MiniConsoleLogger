@@ -27,24 +27,18 @@ namespace mini::logger
     extern std::mutex                       g_logMutex;
     extern thread_local ConsoleColorWindows g_consoleColorWindows;
 
+    const char* const PARAMS_DELIMITER { "|*" };
     const struct SourceFile
     {
         // {
-        std::string path;
+        std::string_view path;
         long line;
         // }
 
-        inline auto getLine(const size_t fixedSize) const -> std::string
+        inline auto getName() const -> std::string_view
         {
-            auto str = std::to_string(line);
-            str.resize(fixedSize);
-            return str;
-        }
-        inline auto getName(const size_t fixedSize) const -> std::string
-        {
-            auto str = path.substr(path.find_last_of("\\") + 1); //windows path, todo: unix
-            str.resize(fixedSize);
-            return str;
+            return path.substr(path.find_last_of("\\") + 1); 
+            //windows path, todo: unix
         }
     };
 
@@ -54,7 +48,7 @@ namespace mini::logger
         if constexpr (sizeof...(Args) > 0) {
             std::stringstream sstream;
             int expanderTrick[sizeof...(Args)] = {
-                ((sstream << args << ","), 0) ...
+                ((sstream << args << PARAMS_DELIMITER), 0) ...
                 //most right of comma expression will be assigned to tmp array
                 //but everything will be evaluated, so the sstream gets filled 
             };
